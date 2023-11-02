@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDF Compressor</title>
+    <link rel= "stylesheet" type= "text/css" href= "/static/styles.css">
+  </head>
+  <body>
+    <div class="nav_top">
+        <h1 class="nav_top_in"> PDF Compressor</h1>
+    </div>
+ 
+    <div class="main">
+      <div class="adobe-dc-vieww">
+        <div id="adobe-dc-view"></div>
+ 
+        <!--{% if pdf_output1 %}
+<script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+ 
+<script type="text/javascript">
+        document.addEventListener("adobe_dc_view_sdk.ready", function(){ 
+                var adobeDCView = new AdobeDC.View({clientId: "cf1c6b833f5740529817a009c47a4116", divId: "adobe-dc-view"});
+                adobeDCView.previewFile({
+                        content:{location: {url: pdf_output1"}},
+                        metaData:{fileName: "Andorid_Assign-1.pdf"}
+                }, {});
+        });
+</script>    
+{% endif %}
+<form method="POST" action="/" enctype="multipart/form-data">
+        <input type="file" name="pdf" accept=".pdf" required>
+        <label for="resize_percentage">Resize Percentage:</label>
+        <input type="range" name="resize_percentage" id="resize_percentage" min="1" max="100" value="50">
+        <span id="resize_percentage_label">50%</span>
+        <input type="submit" value="Upload and Resize">
+    </form>
+-->
+ 
+        <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+ 
+        <script>
+        //   function handleChange(event) {
+        //     console.log(event);
+        //     console.log("https://jugnu.me/download/{{ pdf_output }}");
+ 
+        //     console.log("inside event listener...");
+        //     
+        //   }
+ 
+        //   console.log("hello");
+      
+// function handleChange(event) {
+//     // Retrieve the selected file
+//     const selectedFile = event.target.files[0];
+    
+//     // Get the file path
+//     const filePath = URL.createObjectURL(selectedFile);
+    
+//     // Log the file path or use it as needed
+//     console.log("Selected file path: " + filePath);
+// }
+function uploadFile(inputElement) {
+  const selectedFile = inputElement.files[0];
+  const formData = new FormData();
+  formData.append("pdf", selectedFile);
+
+  fetch("/upload", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((pdfUrl) => {
+        console.log(pdfUrl);
+        var adobeDCView = new AdobeDC.View({
+              clientId: "cf1c6b833f5740529817a009c47a4116",
+              divId: "adobe-dc-view",
+            });
+            adobeDCView.previewFile(
+              {
+                content: {
+                  location: {
+                    url: "https://jugnu.me/download/"+pdfUrl,
+                  },
+                },
+                metaData: { fileName: extractFileNameFromPath(pdfUrl) },
+              },
+              {}
+            );
+    })
+    .catch((error) => {
+      console.error("Error uploading file:", error);
+    });
+}
+ 
+
+        </script>
+      </div>
+ <script>
+  function extractFileNameFromPath(filePath) {
+  const parts = filePath.split('/');
+  return parts[parts.length - 1];
+}
+  </script>
+
+      <div class="up_form">
+        <form class="form" method="POST" action="/" enctype="multipart/form-data">
+          
+            <input
+            class="form_input_1 "
+            type="file"
+            name="pdf"
+            accept=".pdf"
+            onchange="uploadFile(this)"
+            required>
+ 
+          <label class="form_input" for="resize_percentage">Resize Percentage:</label>
+         
+          <input
+            class="form_input"
+            type="range"
+            name="resize_percentage"
+            id="resize_percentage"
+            min="1"
+            max="100"
+            value="50"
+          />
+          <span class="form_input " id="resize_percentage_label">50%</span>
+          <input class="form_input upload_btn" type="submit" value="Resize" />
+        </form>
+ 
+ 
+ 
+      {% if pdf_output %} 
+       <div class="display_size"> 
+             <div class="display_size_1">
+                <h3>Orignal size:</h2>
+                <h3>{{ y }} KB</h2>
+             </div>
+             <div class="display_size_1">
+                <h3>Resized  size:</h2>
+                <h3>{{ x }} KB</h2>
+             </div>
+       
+       </div>
+        <a class="download_p" href="/download/{{ pdf_output }}" download>Download Resized PDF</a>
+ 
+        <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
+ 
+        <script type="text/javascript">
+          document.addEventListener("adobe_dc_view_sdk.ready", function () {
+            var adobeDCView = new AdobeDC.View({
+              clientId: "cf1c6b833f5740529817a009c47a4116",
+              divId: "adobe-dc-view",
+            });
+            adobeDCView.previewFile(
+              {
+                content: {
+                  location: {
+                    url: "https://jugnu.me/download/ {{ pdf_output }}",
+                  },
+                },
+                metaData: { fileName: extractFileNameFromPath(pdf_output) },
+              },
+              {}
+            );
+          });
+        </script>
+        {% endif %}
+ 
+        <script>
+          const resizePercentageInput =
+            document.getElementById("resize_percentage");
+          const resizePercentageLabel = document.getElementById(
+            "resize_percentage_label"
+          );
+
+          // Update the label with the current value of the scroll bar
+          
+          resizePercentageInput.addEventListener("input", () => {
+            resizePercentageLabel.textContent = `${resizePercentageInput.value}%`;
+          });
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
